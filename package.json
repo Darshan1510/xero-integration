@@ -1,0 +1,37 @@
+{
+  "name": "xero-integration",
+  "version": "1.0.0",
+  "description": "Xero intergation with node",
+  "main": "src/app.js",
+  "type": "module",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "nodemon src/app.js",
+    "prod": "node src/app.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Darshan1510/xero-integration.git"
+  },
+  "keywords": [
+    "xero",
+    "xero-integration",
+    "xero-node"
+  ],
+  "author": "Darshan Shah",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Darshan1510/xero-integration/issues"
+  },
+  "homepage": "https://github.com/Darshan1510/xero-integration#readme",
+  "dependencies": {
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "express-session": "^1.18.0",
+    "jwt-decode": "^4.0.0",
+    "xero-node": "^7.0.0"
+  },
+  "devDependencies": {
+    "openid-client": "^5.6.5"
+  }
+}
