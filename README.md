@@ -1,4 +1,4 @@
-# Xero Integration
+# Xero Integration with Node (Javascript - Docker)
 
 This repository contains a Node.js application that integrates with Xero, a cloud-based accounting software. The application provides various functionalities to interact with Xero's API.
 
