@@ -1,0 +1,12 @@
+version: "3.8"
+
+services:
+  app:
+    container_name: xero-integration-container
+    image: xero-integration
+    build:
+      context: .
+    ports:
+      - "5000:5000"
+    env_file:
+      - .env

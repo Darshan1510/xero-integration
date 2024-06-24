@@ -11,6 +11,7 @@ const redirectUrl = process.env.XERO_REDIRECT_URI;
 const scopes =
   "openid profile email accounting.settings accounting.reports.read accounting.journals.read accounting.contacts accounting.attachments accounting.transactions offline_access";
 
+// Create a new XeroClient
 const xero = new XeroClient({
   clientId: client_id,
   clientSecret: client_secret,
@@ -27,6 +28,7 @@ if (!client_id || !client_secret || !redirectUrl) {
 
 const app = express();
 
+// Set up the session
 app.use(
   session({
     secret: "DEVSECRET",
@@ -46,6 +48,7 @@ const authenticationData = (req, res) => {
   };
 };
 
+// Routes
 app.get("/", (req, res) => {
   res.send(`<a href='/connect'>Connect to Xero</a>`);
 });
@@ -63,7 +66,6 @@ app.get("/callback", async (req, res) => {
   try {
     const tokenSet = await xero.apiCallback(req.url);
     await xero.updateTenants();
-    console.log(tokenSet);
     const decodedIdToken = jwtDecode(tokenSet.id_token);
     const decodedAccessToken = jwtDecode(tokenSet.access_token);
 
@@ -72,14 +74,10 @@ app.get("/callback", async (req, res) => {
     req.session.tokenSet = tokenSet;
     req.session.allTenants = xero.tenants;
 
-    console.log(xero.tenants);
-
     // XeroClient is sorting tenants behind the scenes so that most recent / active connection is at index 0
     req.session.activeTenant = xero.tenants[0];
 
     const authData = authenticationData(req, res);
-
-    console.log(authData);
 
     res.redirect("/organisation");
   } catch (err) {
@@ -103,14 +101,12 @@ app.get("/organisation", async (req, res) => {
 app.post("/invoices", async (req, res) => {
   try {
     const contacts = await xero.accountingApi.getContacts(req.session.activeTenant.tenantId);
-    console.log("contacts: ", contacts.body.contacts);
     const where = 'Status=="ACTIVE" AND Type=="SALES"';
     const accounts = await xero.accountingApi.getAccounts(
       req.session.activeTenant.tenantId,
       null,
       where
     );
-    console.log("accounts: ", accounts.body.accounts);
     const contact = {
       contactID: contacts.body.contacts[0].contactID,
     };
@@ -134,7 +130,6 @@ app.post("/invoices", async (req, res) => {
       req.session.activeTenant.tenantId,
       invoices
     );
-    console.log("invoices: ", response.body.invoices);
     res.json(response.body.invoices);
   } catch (err) {
     res.json(err);
@@ -160,7 +155,6 @@ app.post("/contacts", async (req, res) => {
       req.session.activeTenant.tenantId,
       contacts
     );
-    console.log("contacts: ", response.body.contacts);
     res.json(response.body.contacts);
   } catch (err) {
     res.json(err);
@@ -203,6 +197,24 @@ app.get("/payment-history", async (req, res) => {
   } catch (err) {
     res.json(err);
   }
+});
+
+app.get("/reports", async (req, res) => {
+    try {
+        const response = await xero.accountingApi.getReportsList(req.session.activeTenant.tenantId);
+        res.json(response.body.reports);
+    } catch (err) {
+        res.json(err);
+    }
+});
+
+app.get("/reports/TenNinetyNine", async (req, res) => {
+    try {
+        const response = await xero.accountingApi.getReportTenNinetyNine(req.session.activeTenant.tenantId);
+        res.json(response.body.reports);
+    } catch (err) {
+        res.json(err);
+    }
 });
 
 app.get("/logout", async (req, res) => {
